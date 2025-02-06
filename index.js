@@ -1,8 +1,19 @@
 import express from 'express';
 //import pool from './servico/conexao.js';
 import { retornaCampeonatos, retornaCampeonatosID, retornaCampeonatosAno, retornaCampeonatosTime} from './servico/retornaCampeonatos_servico.js';
+import { cadastraCampeonato } from './servico/cadastroCampeonato_servico.js';
 
 const app = express();
+app.use(express.json());    //suporte para JSON no corpo(body) da requisição
+
+app.post('/campeonatos', async (req, res) => {
+    const campeao = req.body.campeao;
+    const vice = req.body.vice;
+    const ano = req.body.ano;
+
+    await cadastraCampeonato(campeao, vice, ano);
+    res.status(204).end();
+})
 
 app.get('/campeonatos', async (req, res) => {    //localhost:9000/campeonatos
     let campeonatos;
@@ -34,7 +45,6 @@ app.get('/campeonatos/:id', async (req, res) => {
         res.status (404).json({ mensagem: "Nenhum campeonato encontrado" });
     }
 });
-
 
 app.listen(9000, () => {
     const data = new Date();
