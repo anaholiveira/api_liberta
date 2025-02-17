@@ -4,13 +4,33 @@ import express from 'express';
 import { retornaCampeonatos, retornaCampeonatosID, retornaCampeonatosAno, retornaCampeonatosTime} from './servico/retornaCampeonatos_servico.js';
 import { cadastraCampeonato } from './servico/cadastroCampeonato_servico.js';
 import { atualizaCampeonato, atualizaCampeonatoParcial } from './servico/atualizaCampeonato_servico.js';
+import { deletaCampeonato } from './servico/deletaCampeonato_servico.js';
 
 const app = express();
 app.use(cors());
 app.use(express.json());    //suporte para JSON no corpo(body) da requisição
 
+app.delete('/campeonatos/:id', async(req, res) => {
+    const {id} = req.params;    // desestruturação ( se existe parametro chamado id )
+    
+
+    if (isNaN(id)) {
+        res.status(404).send("Parâmetro inválido!");
+    }
+    else {
+        const resultado = await deletaCampeonato(id);
+    
+        if (resultado.affectedRows > 0) {
+            res.status(202).send("Registro deletado com sucesso!");
+        } else {
+            res.status(404).send("Registro não encontrado!");
+        }
+    }
+})
+
+
 app.patch('/campeonatos/:id', async(req, res) => {
-    const {id} = req.params;
+    const {id} = req.params;     // desestruturação
     const {campeao, vice, ano} = req.body;
 
     const camposAtualizar = {};  // {campeao: "Flamengo"}
@@ -25,9 +45,9 @@ app.patch('/campeonatos/:id', async(req, res) => {
         const resultado = await atualizaCampeonatoParcial(id, camposAtualizar);
         
         if (resultado.affectedRows > 0) {
-            res.status(202).send("Registro foi atualizado com sucesso");
+            res.status(202).send("Registro foi atualizado com sucesso!");
         } else {
-            res.status(404).send("Registro não encontrado");
+            res.status(404).send("Registro não encontrado!");
         }
     }
 })
@@ -41,9 +61,9 @@ app.put('/campeonatos/:id', async(req, res) => {
     } else {
         const resultado = await atualizaCampeonato(id, campeao, vice, ano);
         if (resultado.affectedRows > 0) {
-            res.status(202).send('Registro atualizado com sucesso');
+            res.status(202).send('Registro atualizado com sucesso!');
         } else {
-            res.status(404).send('Registro não encontrado');
+            res.status(404).send('Registro não encontrado!');
         }
     }
 })
